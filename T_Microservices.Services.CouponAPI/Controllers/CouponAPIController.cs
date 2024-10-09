@@ -1,9 +1,5 @@
 ﻿using AutoMapper;
 
-using Azure;
-
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 using T_Microservices.Services.CouponAPI.Data;
@@ -12,7 +8,7 @@ using T_Microservices.Services.CouponAPI.Models.Dto;
 
 namespace T_Microservices.Services.CouponAPI.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/coupon")]
     [ApiController]
     public class CouponAPIController : ControllerBase
     {
