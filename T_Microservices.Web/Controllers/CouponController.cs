@@ -60,9 +60,9 @@ namespace T_Microservices.Web.Controllers
             return View(model);
         }
 
-        public async Task<IActionResult> CouponDelete(int couponId)
+        public async Task<IActionResult> CouponDelete(int id)
         {
-            ResponseDto? response = await _couponService.GetCouponByIdAsync(couponId);
+            ResponseDto? response = await _couponService.GetCouponByIdAsync(id);
 
             if (response != null && response.IsSuccess)
             {
