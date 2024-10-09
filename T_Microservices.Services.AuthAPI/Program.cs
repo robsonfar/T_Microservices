@@ -1,9 +1,8 @@
-using AutoMapper;
-
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using T_Microservices.Services.AuthAPI.Data;
+using T_Microservices.Services.AuthAPI.Models;
 
-using T_Microservices.Services.CouponAPI;
-using T_Microservices.Services.CouponAPI.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -19,10 +18,9 @@ builder.Services.AddDbContext<ApplicationDbContext>(option =>
     option.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"))
 );
 
-// Mapper
-IMapper mapper = MappingConfig.RegisterMaps().CreateMapper();
-builder.Services.AddSingleton(mapper);
-builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
+    .AddEntityFrameworkStores<ApplicationDbContext>()
+    .AddDefaultTokenProviders();
 
 var app = builder.Build();
 
@@ -35,6 +33,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
