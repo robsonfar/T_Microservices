@@ -83,7 +83,10 @@ namespace T_Microservices.Services.AuthAPI.Service
                 return new LoginResponseDto() { User = null, Token = "" };
             }
 
-            var token = _jwtTokenGenerator.GenerateToken(user);
+            // Generate JWT Token
+            var roles = await _userManager.GetRolesAsync(user);
+
+            var token = _jwtTokenGenerator.GenerateToken(user, roles);
 
             UserDto userDTO = new()
             {
