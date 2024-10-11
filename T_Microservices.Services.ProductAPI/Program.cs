@@ -1,12 +1,11 @@
 using AutoMapper;
-
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 
-using T_Microservices.Services.CouponAPI;
-using T_Microservices.Services.CouponAPI.Data;
-using T_Microservices.Services.CouponAPI.Extensions;
+using T_Microservices.Services.ProductAPI;
+using T_Microservices.Services.ProductAPI.Data;
+using T_Microservices.Services.ProductAPI.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 

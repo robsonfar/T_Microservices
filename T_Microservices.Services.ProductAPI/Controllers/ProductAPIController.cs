@@ -3,23 +3,23 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-using T_Microservices.Services.CouponAPI.Data;
-using T_Microservices.Services.CouponAPI.Models;
-using T_Microservices.Services.CouponAPI.Models.Dto;
+using T_Microservices.Services.ProductAPI.Data;
+using T_Microservices.Services.ProductAPI.Models;
+using T_Microservices.Services.ProductAPI.Models.Dto;
 
-namespace T_Microservices.Services.CouponAPI.Controllers
+namespace T_Microservices.Services.ProductAPI.Controllers
 {
-    [Route("api/coupon")]
+    [Route("api/product")]
     [ApiController]
     [Authorize]
-    public class CouponAPIController : ControllerBase
+    public class ProductAPIController : ControllerBase
     {
         private readonly ApplicationDbContext _dbContext;
 
         private ResponseDto _responseDto;
         private IMapper _mapper;
 
-        public CouponAPIController(ApplicationDbContext dbContext, 
+        public ProductAPIController(ApplicationDbContext dbContext,
             IMapper mapper)
         {
             _dbContext = dbContext;
@@ -33,8 +33,8 @@ namespace T_Microservices.Services.CouponAPI.Controllers
         {
             try
             {
-                IEnumerable<Coupon> objList = _dbContext.Coupon.ToList();
-                _responseDto.Result = _mapper.Map<IEnumerable<CouponDto>>(objList);
+                IEnumerable<Product> objList = _dbContext.Product.ToList();
+                _responseDto.Result = _mapper.Map<IEnumerable<ProductDto>>(objList);
             }
             catch (Exception ex)
             {
@@ -51,8 +51,8 @@ namespace T_Microservices.Services.CouponAPI.Controllers
         {
             try
             {
-                Coupon obj = _dbContext.Coupon.First(u => u.Id == id);
-                _responseDto.Result = _mapper.Map<CouponDto>(obj);
+                Product obj = _dbContext.Product.First(u => u.Id == id);
+                _responseDto.Result = _mapper.Map<ProductDto>(obj);
             }
             catch (Exception ex)
             {
@@ -60,39 +60,21 @@ namespace T_Microservices.Services.CouponAPI.Controllers
                 _responseDto.Message = ex.Message;
             }
 
-            return _responseDto;
-        }
-
-
-        [HttpGet]
-        [Route("GetByCode/{code}")]
-        public ResponseDto GetByCode(string code)
-        {
-            try
-            {
-                Coupon obj = _dbContext.Coupon.First(u => u.Code.ToLower() == code.ToLower());
-                _responseDto.Result = _mapper.Map<CouponDto>(obj);
-            }
-            catch (Exception ex)
-            {
-                _responseDto.IsSuccess = false;
-                _responseDto.Message = ex.Message;
-            }
             return _responseDto;
         }
 
         [HttpPost]
         [Authorize(Roles = "ADMIN")]
-        public ResponseDto Post([FromBody] CouponDto couponDto)
+        public ResponseDto Post([FromBody] ProductDto dto)
         {
             try
             {
-                Coupon obj = _mapper.Map<Coupon>(couponDto);
+                Product obj = _mapper.Map<Product>(dto);
 
-                _dbContext.Coupon.Add(obj);
+                _dbContext.Product.Add(obj);
                 _dbContext.SaveChanges();
 
-                _responseDto.Result = _mapper.Map<CouponDto>(obj);
+                _responseDto.Result = _mapper.Map<ProductDto>(obj);
             }
             catch (Exception ex)
             {
@@ -105,16 +87,16 @@ namespace T_Microservices.Services.CouponAPI.Controllers
 
         [HttpPut]
         [Authorize(Roles = "ADMIN")]
-        public ResponseDto Put([FromBody] CouponDto couponDto)
+        public ResponseDto Put([FromBody] ProductDto dto)
         {
             try
             {
-                Coupon obj = _mapper.Map<Coupon>(couponDto);
+                Product obj = _mapper.Map<Product>(dto);
 
-                _dbContext.Coupon.Update(obj);
+                _dbContext.Product.Update(obj);
                 _dbContext.SaveChanges();
 
-                _responseDto.Result = _mapper.Map<CouponDto>(obj);
+                _responseDto.Result = _mapper.Map<ProductDto>(obj);
             }
             catch (Exception ex)
             {
@@ -131,9 +113,9 @@ namespace T_Microservices.Services.CouponAPI.Controllers
         {
             try
             {
-                Coupon obj = _dbContext.Coupon.First(u => u.Id == id);
+                Product obj = _dbContext.Product.First(u => u.Id == id);
 
-                _dbContext.Coupon.Remove(obj);
+                _dbContext.Product.Remove(obj);
                 _dbContext.SaveChanges();
             }
             catch (Exception ex)
