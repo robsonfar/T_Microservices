@@ -1,3 +1,15 @@
+using AutoMapper;
+
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.OpenApi.Models;
+
+using T_Microservices.Services.ShoppingCartAPI;
+using T_Microservices.Services.ShoppingCartAPI.Data;
+using T_Microservices.Services.ShoppingCartAPI.Extensions;
+using T_Microservices.Services.ShoppingCartAPI.Service;
+using T_Microservices.Services.ShoppingCartAPI.Service.IService;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -5,7 +17,55 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+
+builder.Services.AddSwaggerGen(option =>
+{
+    // Configure for Authentication
+    option.AddSecurityDefinition(name: JwtBearerDefaults.AuthenticationScheme, securityScheme: new OpenApiSecurityScheme
+    {
+        Name = "Authorization",
+        Description = "Enter the Bearer Authorization string as following: `Bearer Generated-JWT-Token`",
+        In = ParameterLocation.Header,
+        Type = SecuritySchemeType.ApiKey,
+        Scheme = "Bearer"
+    });
+    option.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference
+                {
+                    Type = ReferenceType.SecurityScheme,
+                    Id = JwtBearerDefaults.AuthenticationScheme
+                }
+            }, new string[]{}
+        }
+    });
+});
+
+// Authentication
+builder.AddAppAuthetication();
+builder.Services.AddAuthorization();
+
+// Database
+builder.Services.AddDbContext<ApplicationDbContext>(option =>
+    option.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"))
+);
+
+// Mapper
+IMapper mapper = MappingConfig.RegisterMaps().CreateMapper();
+builder.Services.AddSingleton(mapper);
+builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+
+// ProductAPI
+builder.Services.AddHttpClient("Product", u => u.BaseAddress = new Uri(builder.Configuration["ServiceUrls:ProductAPI"]));
+builder.Services.AddScoped<IProductService, ProductService>();
+
+// CouponAPI
+builder.Services.AddHttpClient("Coupon", u => u.BaseAddress = new Uri(builder.Configuration["ServiceUrls:CouponAPI"]));
+builder.Services.AddScoped<ICouponService, CouponService>();
+
 
 var app = builder.Build();
 
@@ -18,8 +78,27 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
 
+// Apply Migrations
+ApplyMigration();
+
 app.Run();
+
+
+// Apply Migrations method
+void ApplyMigration()
+{
+    using (var scope = app.Services.CreateScope())
+    {
+        var _db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+
+        if (_db.Database.GetPendingMigrations().Count() > 0)
+        {
+            _db.Database.Migrate();
+        }
+    }
+}
