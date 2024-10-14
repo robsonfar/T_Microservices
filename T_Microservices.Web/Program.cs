@@ -38,6 +38,11 @@ SD.ProductAPIBase = builder.Configuration["ServiceUrls:ProductAPI"];
 builder.Services.AddHttpClient<IProductService, ProductService>();
 builder.Services.AddScoped<IProductService, ProductService>();
 
+// ShoppingCartAPI
+SD.ShoppingCartAPIBase = builder.Configuration["ServiceUrls:ShoppingCartAPI"];
+builder.Services.AddHttpClient<ICartService, CartService>();
+builder.Services.AddScoped<ICartService, CartService>();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
