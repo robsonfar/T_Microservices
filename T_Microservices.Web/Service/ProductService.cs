@@ -60,5 +60,6 @@ namespace T_Microservices.Web.Service
                 Url = SD.ProductAPIBase + "/api/product"
             });
         }
+
     }
 }

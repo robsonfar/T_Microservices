@@ -1,28 +1,60 @@
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Cors.Infrastructure;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 
 using System.Diagnostics;
 
 using T_Microservices.Web.Models;
+using T_Microservices.Web.Service.IService;
 
 namespace T_Microservices.Web.Controllers
 {
     public class HomeController : Controller
     {
-        private readonly ILogger<HomeController> _logger;
+        private readonly IProductService _productService;
 
-        public HomeController(ILogger<HomeController> logger)
+        public HomeController(IProductService productService)
         {
-            _logger = logger;
+            _productService = productService;
         }
 
-        public IActionResult Index()
+
+        public async Task<IActionResult> Index()
         {
-            return View();
+            List<ProductDto>? list = new();
+
+            ResponseDto? response = await _productService.GetAllAsync();
+
+            if (response != null && response.IsSuccess)
+            {
+                list = JsonConvert.DeserializeObject<List<ProductDto>>(Convert.ToString(response.Result));
+            }
+            else
+            {
+                TempData["error"] = response?.Message;
+            }
+
+            return View(list);
         }
 
-        public IActionResult Privacy()
+        [Authorize]
+        public async Task<IActionResult> ProductDetails(int productId)
         {
-            return View();
+            ProductDto? model = new();
+
+            ResponseDto? response = await _productService.GetByIdAsync(productId);
+
+            if (response != null && response.IsSuccess)
+            {
+                model = JsonConvert.DeserializeObject<ProductDto>(Convert.ToString(response.Result));
+            }
+            else
+            {
+                TempData["error"] = response?.Message;
+            }
+
+            return View(model);
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
@@ -30,5 +62,6 @@ namespace T_Microservices.Web.Controllers
         {
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
+
     }
 }

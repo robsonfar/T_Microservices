@@ -11,15 +11,13 @@ builder.Services.AddControllersWithViews();
 
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddHttpClient();
-builder.Services.AddHttpClient<ICouponService, CouponService>();
 
-SD.CouponAPIBase = builder.Configuration["ServiceUrls:CouponAPI"];
+// Auth
 SD.AuthAPIBase = builder.Configuration["ServiceUrls:AuthAPI"];
 
-builder.Services.AddScoped<IBaseService, BaseService>();
-builder.Services.AddScoped<ICouponService, CouponService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<ITokenProvider, TokenProvider>();
+builder.Services.AddScoped<IBaseService, BaseService>();
 
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options =>
@@ -29,6 +27,16 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
             options.AccessDeniedPath = "/Auth/AccessDenied";
         }
     );
+
+// CouponAPI
+SD.CouponAPIBase = builder.Configuration["ServiceUrls:CouponAPI"];
+builder.Services.AddHttpClient<ICouponService, CouponService>();
+builder.Services.AddScoped<ICouponService, CouponService>();
+
+// ProductAPI
+SD.ProductAPIBase = builder.Configuration["ServiceUrls:ProductAPI"];
+builder.Services.AddHttpClient<IProductService, ProductService>();
+builder.Services.AddScoped<IProductService, ProductService>();
 
 var app = builder.Build();
 

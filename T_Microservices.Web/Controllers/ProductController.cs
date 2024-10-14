@@ -49,7 +49,7 @@ namespace T_Microservices.Web.Controllers
 
                 if (response != null && response.IsSuccess)
                 {
-                    TempData["success"] = "Product created successfully";
+                    TempData["success"] = "Created successfully";
                     return RedirectToAction(nameof(Index));
                 }
                 else
@@ -58,6 +58,44 @@ namespace T_Microservices.Web.Controllers
                 }
             }
             return View(model);
+        }
+
+        public async Task<IActionResult> Edit(int id)
+        {
+            ResponseDto? response = await _service.GetByIdAsync(id);
+
+            if (response != null && response.IsSuccess)
+            {
+                ProductDto? model = JsonConvert.DeserializeObject<ProductDto>(Convert.ToString(response.Result));
+                return View(model);
+            }
+            else
+            {
+                TempData["error"] = response?.Message;
+            }
+
+            return NotFound();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Edit(ProductDto dto)
+        {
+            if (ModelState.IsValid)
+            {
+                ResponseDto? response = await _service.UpdateAsync(dto);
+
+                if (response != null && response.IsSuccess)
+                {
+                    TempData["success"] = "Updated successfully";
+                    return RedirectToAction(nameof(Index));
+                }
+                else
+                {
+                    TempData["error"] = response?.Message;
+                }
+            }
+
+            return View(dto);
         }
 
         public async Task<IActionResult> Delete(int id)
@@ -83,7 +121,7 @@ namespace T_Microservices.Web.Controllers
 
             if (response != null && response.IsSuccess)
             {
-                TempData["success"] = "Product deleted successfully";
+                TempData["success"] = "Deleted successfully";
                 return RedirectToAction(nameof(Index));
             }
             else
@@ -93,5 +131,6 @@ namespace T_Microservices.Web.Controllers
 
             return View(dto);
         }
+
     }
 }

@@ -11,7 +11,7 @@ namespace T_Microservices.Services.ProductAPI.Controllers
 {
     [Route("api/product")]
     [ApiController]
-    [Authorize]
+    //[Authorize]
     public class ProductAPIController : ControllerBase
     {
         private readonly ApplicationDbContext _dbContext;
@@ -27,6 +27,7 @@ namespace T_Microservices.Services.ProductAPI.Controllers
 
             _responseDto = new ResponseDto();
         }
+
 
         [HttpGet]
         public object Get()
@@ -81,6 +82,7 @@ namespace T_Microservices.Services.ProductAPI.Controllers
                 _responseDto.IsSuccess = false;
                 _responseDto.Message = ex.Message;
             }
+
             return _responseDto;
         }
 
@@ -103,6 +105,7 @@ namespace T_Microservices.Services.ProductAPI.Controllers
                 _responseDto.IsSuccess = false;
                 _responseDto.Message = ex.Message;
             }
+
             return _responseDto;
         }
 
@@ -123,6 +126,7 @@ namespace T_Microservices.Services.ProductAPI.Controllers
                 _responseDto.IsSuccess = false;
                 _responseDto.Message = ex.Message;
             }
+
             return _responseDto;
         }
 
