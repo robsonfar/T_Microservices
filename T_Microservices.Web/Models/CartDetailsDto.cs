@@ -1,4 +1,4 @@
-﻿namespace T_Microservices.Web.Models.Dto
+﻿namespace T_Microservices.Web.Models
 {
     public class CartDetailsDto
     {

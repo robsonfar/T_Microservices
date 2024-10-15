@@ -9,6 +9,7 @@ using T_Microservices.Services.ShoppingCartAPI.Data;
 using T_Microservices.Services.ShoppingCartAPI.Extensions;
 using T_Microservices.Services.ShoppingCartAPI.Service;
 using T_Microservices.Services.ShoppingCartAPI.Service.IService;
+using T_Microservices.Services.ShoppingCartAPI.Util;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -47,6 +48,8 @@ builder.Services.AddSwaggerGen(option =>
 // Authentication
 builder.AddAppAuthetication();
 builder.Services.AddAuthorization();
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddScoped<BackendApiAuthenticationHttpClientHandler>();
 
 // Database
 builder.Services.AddDbContext<ApplicationDbContext>(option =>
@@ -59,11 +62,15 @@ builder.Services.AddSingleton(mapper);
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
 // ProductAPI
-builder.Services.AddHttpClient("Product", u => u.BaseAddress = new Uri(builder.Configuration["ServiceUrls:ProductAPI"]));
+builder.Services
+    .AddHttpClient("Product", u => u.BaseAddress = new Uri(builder.Configuration["ServiceUrls:ProductAPI"]))
+    .AddHttpMessageHandler<BackendApiAuthenticationHttpClientHandler>();
 builder.Services.AddScoped<IProductService, ProductService>();
 
 // CouponAPI
-builder.Services.AddHttpClient("Coupon", u => u.BaseAddress = new Uri(builder.Configuration["ServiceUrls:CouponAPI"]));
+builder.Services
+    .AddHttpClient("Coupon", u => u.BaseAddress = new Uri(builder.Configuration["ServiceUrls:CouponAPI"]))
+    .AddHttpMessageHandler<BackendApiAuthenticationHttpClientHandler>();
 builder.Services.AddScoped<ICouponService, CouponService>();
 
 
