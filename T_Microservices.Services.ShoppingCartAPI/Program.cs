@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 
+using T_Microservices.MessageBus;
 using T_Microservices.Services.ShoppingCartAPI;
 using T_Microservices.Services.ShoppingCartAPI.Data;
 using T_Microservices.Services.ShoppingCartAPI.Extensions;
@@ -72,6 +73,9 @@ builder.Services
     .AddHttpClient("Coupon", u => u.BaseAddress = new Uri(builder.Configuration["ServiceUrls:CouponAPI"]))
     .AddHttpMessageHandler<BackendApiAuthenticationHttpClientHandler>();
 builder.Services.AddScoped<ICouponService, CouponService>();
+
+// MessageBus
+builder.Services.AddScoped<IMessageBus, MessageBus>();
 
 
 var app = builder.Build();

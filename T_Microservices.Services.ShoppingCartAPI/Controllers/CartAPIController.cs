@@ -6,6 +6,8 @@ using T_Microservices.Services.ShoppingCartAPI.Models;
 using T_Microservices.Services.ShoppingCartAPI.Data;
 using Microsoft.EntityFrameworkCore;
 using T_Microservices.Services.ShoppingCartAPI.Service.IService;
+using Microsoft.Extensions.Configuration;
+using T_Microservices.MessageBus;
 
 namespace T_Microservices.Services.ShoppingCartAPI.Controllers
 {
@@ -18,16 +20,22 @@ namespace T_Microservices.Services.ShoppingCartAPI.Controllers
         private readonly ApplicationDbContext _dbContext;
         private IProductService _productService;
         private ICouponService _couponService;
+        private readonly IMessageBus _messageBus;
+        private readonly IConfiguration _configuration;
 
         public CartAPIController(ApplicationDbContext dbContext
             , IMapper mapper
             , IProductService productService
-            , ICouponService couponService)
+            , ICouponService couponService
+            , IMessageBus messageBus
+            , IConfiguration configuration)
         {
             _dbContext = dbContext;
             _mapper = mapper;
             _productService = productService;
             _couponService = couponService;
+            _messageBus = messageBus;
+            _configuration = configuration;
 
             _response = new ResponseDto();
         }
@@ -177,6 +185,24 @@ namespace T_Microservices.Services.ShoppingCartAPI.Controllers
 
                 _dbContext.CartHeader.Update(cartFromDb);
                 await _dbContext.SaveChangesAsync();
+
+                _response.Result = true;
+            }
+            catch (Exception ex)
+            {
+                _response.IsSuccess = false;
+                _response.Message = ex.ToString();
+            }
+
+            return _response;
+        }
+
+        [HttpPost("EmailCartRequest")]
+        public async Task<object> EmailCartRequest([FromBody] CartDto cartDto)
+        {
+            try
+            {
+                await _messageBus.PublishMessage(cartDto, _configuration.GetValue<string>("TopicAndQueueNames:EmailShoppingCartQueue"));
 
                 _response.Result = true;
             }
